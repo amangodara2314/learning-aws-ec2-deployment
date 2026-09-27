@@ -1,7 +1,29 @@
 services:
   backend:
     build: .
+    depends_on:
+      redis:
+        condition: service_healthy
     ports:
       - 5000:5000
     env_file:
       - .env
+    volumes:
+      - ".:/app"
+
+  redis:
+    image: redis
+    container_name: myRedis
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
